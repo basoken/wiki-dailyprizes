@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>basoken</title>
+<link rel="stylesheet" href="daily_rewards.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: transparent;
+}
+.reward-panel {
+display: none; /* otomatik açılmaz */
+width: 900px;
+background-color: #1e1e1e;
+color: white;
+padding: 25px 30px;
+border-radius: 10px;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+.close-btn {
+position: absolute;
+top: 15px;
+right: 20px;
+background: none;
+color: white;
+font-size: 22px;
+border: none;
+cursor: pointer;
+}
+.rewards-container {
+display: flex;
+justify-content: space-between;
+margin-top: 30px;
+flex-wrap: wrap;
+}
+.reward-box {
+width: 110px;
+height: 160px;
+border-radius: 10px;
+text-align: center;
+font-size: 14px;
+padding: 10px;
+box-sizing: border-box;
+position: relative;
+cursor: pointer;
+}
+.reward-box .status {
+position: absolute;
+top: 6px;
+left: 0;
+right: 0;
+font-size: 12px;
+color: #ccc;
+opacity: 0.8;
+}
+.reward-box span {
+font-weight: bold;
+font-size: 15px;
+display: block;
+margin-top: 20px;
+}
+.icon {
+font-size: 28px;
+margin: 10px 0;
+display: block;
+}
+.alindi { background-color: #2e2e2e; opacity: 0.5; }
+.alinabilir { background-color: #79508A; color: white; font-weight: bold; border: 2px solid #fff; }
+.bekleniyor { background-color: #24252a; opacity: 0.3; }
+</style>
+</head>
+<body>
+<div class="reward-panel" id="rewardPanel">
+<button class="close-btn" onclick="closePanel()">X</button>
+<h2>Günlük Ödüller</h2>
+<p>Her gün giriş sağlayarak ödülleri kazanabilirsin!</p>
+<div class="rewards-container">
+<div class="reward-box" id="day1"><div class="status"></div><span>#1</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>2500$</p></div>
+<div class="reward-box" id="day2"><div class="status"></div><span>#2</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>3500$</p></div>
+<div class="reward-box" id="day3"><div class="status"></div><span>#3</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>4500$</p></div>
+<div class="reward-box" id="day4"><div class="status"></div><span>#4</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>5500$</p></div>
+<div class="reward-box" id="day5"><div class="status"></div><span>#5</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>6500$</p></div>
+<div class="reward-box" id="day6"><div class="status"></div><span>#6</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>7500$</p></div>
+<div class="reward-box" id="day7"><div class="status"></div><span>#7</span><i class="fas fa-money-bill-wave icon"></i><p>Para<br>8500$</p></div>
+</div>
+</div>
+<script>
+let rewardData = null;
+function closePanel() {
+document.getElementById("rewardPanel").style.display = "none";
+fetch("https://dailprizes/close", { method: "POST" });
+}
+window.addEventListener('message', function(event) {
+if(event.data.action === "openUI") {
+rewardData = event.data.rewardData;
+document.getElementById("rewardPanel").style.display = "block";
+updateRewards(rewardData);
+}
+if(event.data.action === "updateUI") {
+rewardData = event.data.rewardData;
+updateRewards(rewardData);
+}
+});
+function postNUI(action, data) {
+fetch(`https://dailprizes/${action}`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(data || {})
+});
+}
+function updateRewards(data){
+document.querySelectorAll('.reward-box').forEach((box, i) => {
+let day = i + 1;
+box.className = "reward-box"; 
+box.querySelector('.status').innerText = "";
+if(day < data.day){
+box.classList.add("alindi");
+box.querySelector('.status').innerText = "Alındı";
+box.onclick = null;
+} else if(day === data.day){
+let now = Date.now()/1000;
+let lastClaim = data.lastClaim || 0;
+let cooldown = 10;
+if(now - lastClaim >= cooldown){
+box.classList.add("alinabilir");
+box.querySelector('.status').innerText = "Alınabilir";
+box.onclick = () => postNUI("claimReward", {});
+} else {
+box.classList.add("bekleniyor");
+let remaining = cooldown - (now - lastClaim);
+box.querySelector('.status').innerText = `Bekleniyor (${Math.ceil(remaining)}s)`;
+box.onclick = () => postNUI("checkTime", {});
+}
+} else {
+box.classList.add("bekleniyor");
+box.querySelector('.status').innerText = "Bekleniyor";
+box.onclick = () => postNUI("checkTime", {});
+}
+});
+}
+setInterval(() => {
+if(rewardData) fetch("https://dailprizes/checkTime", { method: "POST" });
+}, 1000);
+</script>
+</body>
+</html>

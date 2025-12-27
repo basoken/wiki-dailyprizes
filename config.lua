@@ -1,14 +1,7 @@
-# wiki-dashcam
+Config = {}
 
-## in-game showroom
-https://www.youtube.com/watch?v=FPahddGu1J4
-
-![Demo](preview.png)
-
-## Usage
-```lua
 Config.DailyRewards = {
-    Cooldowns = {      -- in seconds (1 day = 24 * 60 * 60)
+    Cooldowns = {      -- saniye cinsinden (1 gün = 24*60*60)
         24 * 60 * 60, 
         24 * 60 * 60, 
         24 * 60 * 60, 
@@ -18,7 +11,7 @@ Config.DailyRewards = {
         24 * 60 * 60 
     },
 
-    Rewards = {        -- Daily reward amounts
+    Rewards = {        -- Gün başına ödül miktarları
         2500,
         3500,
         4500,
@@ -28,4 +21,3 @@ Config.DailyRewards = {
         8500
     }
 }
-```
