@@ -12,7 +12,7 @@ font-family: Arial, sans-serif;
 background: transparent;
 }
 .reward-panel {
-display: none; /* otomatik açılmaz */
+display: none;
 width: 900px;
 background-color: #1e1e1e;
 color: white;
@@ -95,7 +95,7 @@ display: block;
 let rewardData = null;
 function closePanel() {
 document.getElementById("rewardPanel").style.display = "none";
-fetch("https://dailprizes/close", { method: "POST" });
+fetch("https://wiki-dailyprizes/close", { method: "POST" });
 }
 window.addEventListener('message', function(event) {
 if(event.data.action === "openUI") {
@@ -109,11 +109,11 @@ updateRewards(rewardData);
 }
 });
 function postNUI(action, data) {
-fetch(`https://dailprizes/${action}`, {
+fetch(`https://wiki-dailyprizes/${action}`, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(data || {})
-});
+}).catch(err => console.error(`NUI Error (${action}):`, err));
 }
 function updateRewards(data){
 document.querySelectorAll('.reward-box').forEach((box, i) => {
@@ -146,7 +146,7 @@ box.onclick = () => postNUI("checkTime", {});
 });
 }
 setInterval(() => {
-if(rewardData) fetch("https://dailprizes/checkTime", { method: "POST" });
+if(rewardData) postNUI("checkTime", {});
 }, 1000);
 </script>
 </body>

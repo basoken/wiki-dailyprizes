@@ -2,11 +2,19 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 RegisterNetEvent("daily_rewards:openUI", function(data)
     SetNuiFocus(true, true)
-    SendNUIMessage({ action = "openUI", rewardData = data })
+    local safeData = {
+        day = data.day,
+        lastClaim = data.lastClaim
+    }
+    SendNUIMessage({ action = "openUI", rewardData = safeData })
 end)
 
 RegisterNetEvent("daily_rewards:updateUI", function(data)
-    SendNUIMessage({ action = "updateUI", rewardData = data })
+    local safeData = {
+        day = data.day,
+        lastClaim = data.lastClaim
+    }
+    SendNUIMessage({ action = "updateUI", rewardData = safeData })
 end)
 
 RegisterNUICallback("claimReward", function(_, cb)
