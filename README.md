@@ -1,4 +1,4 @@
-# wiki-dashcam
+# wiki-dailyprizes
 
 ## in-game showroom
 https://www.youtube.com/watch?v=FPahddGu1J4
